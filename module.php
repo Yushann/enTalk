@@ -26,10 +26,10 @@
     <!-- firebase -->
     <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"></script>
-    <script src="js/utility.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/lang.tw.js"></script>
+    <script src="js/utility.js?v=20180312"></script>
+    <script src="js/model.js?v=20180312"></script>
+    <script src="js/ui.js?v=20180312"></script>
+    <script src="js/lang.tw.js?v=20180312"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
     <!-- firebase -->

@@ -57,12 +57,17 @@ List = (function($, window){
 			tmp.join_btn_name = lang.meeting_is_end;
 			tmp.join_btn_class = 'secondary';
 		}else if(mylist[doc.id] != undefined){
-			tmp.join_btn_disabled = 'disabled';
-			tmp.join_btn_name = lang.meeting_joined;
-			tmp.join_btn_class = 'secondary';
-			// tmp.join_btn_disabled = (userData.uid == data.host_id) ? 'disabled' : '';
-			// tmp.join_btn_name = lang.meeting_quit;
-			// tmp.join_btn_class = 'success';
+			var today = new Date();
+			if(data.start_time < new Date(today.getTime() + 86400*2)) {
+				tmp.join_btn_disabled = 'disabled';
+				tmp.join_btn_name = lang.meeting_joined;
+				tmp.join_btn_class = 'secondary';
+			} else {
+				//host 不能離開，其它人可以
+				tmp.join_btn_disabled = (userData.uid == data.host_id) ? 'disabled' : '';
+				tmp.join_btn_name = lang.meeting_quit;
+				tmp.join_btn_class = 'success';
+			}
 
 			Object.keys(data.joined).forEach(function(key) {
 				if(data.joined[key] == userData.uid) {

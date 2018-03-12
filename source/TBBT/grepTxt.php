@@ -19,7 +19,7 @@
     $fp = fopen($filename.'.txt', 'w');
     foreach($html->find('div[class=entrytext] p') as $element) {
       $line = html_entity_decode($element->innertext, ENT_COMPAT, 'utf-8');
-      fwrite($fp, strip_tags($line)."\r\n");
+      fwrite($fp, strip_tags($line)."\r\n\r\n");
     }
     fclose($fp);
     echo "{$filename} done\n";
