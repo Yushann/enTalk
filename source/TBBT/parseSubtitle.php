@@ -6,6 +6,7 @@
   $files = array_slice(scandir('.'), 2);
   $scripts = Array();
 
+/*
   foreach($files as $file){
     $mime_type = $file_info->buffer(file_get_contents($file));
     if($mime_type == 'text/plain; charset=utf-8') {
@@ -20,6 +21,9 @@
       $scripts[$filename_matches[1]][$filename_matches[2]] = $result;
     }
   }
+*/
+
+  $result = parseFile('S1E7.txt');
 
   function parseFile($file) {
     exec('grep \'[a-zA-Z]:\' '.$file.' | awk -F":" \'{print $1}\' | sort | uniq', $output);
@@ -54,15 +58,18 @@
       }
     }
 
-    $data["recommend_num"] = count($newMapping);
+    $data["recommend_num"] = count($data);
     while(list($k, $p) = each($newMapping)) {
       $data["recommend_group"][join(', ',$p)] = "";
     }
 
+    echo print_r($newCount);
+    echo print_r($data);
     echo "{$file} ".count($data["recommend_group"])."<br>";
 
     return $data;
   }
+/*
 ?>
 <html>
   <head>
@@ -96,3 +103,4 @@
     
   </body>
 </html>
+<?*/

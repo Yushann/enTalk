@@ -1,8 +1,15 @@
 <?php
 	date_default_timezone_set("Asia/Taipei");
 
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
+
+    require 'vendor/phpmailer/phpmailer/src/Exception.php';
+    require 'vendor/phpmailer/phpmailer/src/PHPMailer.php';
+    require 'vendor/phpmailer/phpmailer/src/SMTP.php';
+
 	$data = json_decode($_POST['data']);
-	$mailto = htmlspecialchars($_POST['to'], ENT_QUOTES);
+	$mailto = trim(htmlspecialchars($_POST['to'], ENT_QUOTES));
 	$character = htmlspecialchars($_POST['character'], ENT_QUOTES);
 
 	$epsoide_data = explode('/', $data->reference);
@@ -15,42 +22,59 @@
 
 	$subject = "英文口說練習 {$start_date} {$data->title}";
     $filepath = "/home/lalala/source/{$series}/{$filename}";
+    //$filepath = "source/{$series}/{$filename}";
 
-    $message = "\n時間：{$start_time}\n地點：{$data->mode_data}\n美劇：{$data->title}\n角色：{$character}\n主持人：{$data->host}\n聯絡方式：{$data->host_email}";
+    $message = "<br>時間：{$start_time}<br>地點：{$data->mode_data}<br>美劇：{$data->title}<br>角色：{$character}<br>主持人：{$data->host}<br>聯絡方式：{$data->host_email}";
 
-    $content = file_get_contents($filepath);
-    $content = chunk_split(base64_encode($content));
+    $mail = new PHPMailer();
+    $mail->IsSMTP();
+    $mail->SMTPAuth = true; // turn on SMTP authentication
+    //這幾行是必須的
+    $mail->Host = 'tls://mail.gmx.com:587';
+    $mail->SMTPOptions = array(
+       'ssl' => array(
+         'verify_peer' => false,
+         'verify_peer_name' => false,
+         'allow_self_signed' => true
+        )
+    );
 
-    // a random hash will be necessary to send mixed content
-    $separator = md5(time());
+    $mail->CharSet = "utf-8"; //郵件編碼
 
-    // carriage return type (RFC)
-    $eol = "\r\n";
+    $mail->Username = "yushann@gmx.com";
+    $mail->Password = "87654321";
+    //這邊是你的gmail帳號和密碼
 
-    // main header (multipart mandatory)
-    $headers = "From: 英文口說練習 <info@lalala.acsite.org>" . $eol;
-    $headers .= "MIME-Version: 1.0" . $eol;
-    $headers .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"" . $eol;
-    $headers .= "Content-Transfer-Encoding: 7bit" . $eol;
-    $headers .= "This is a MIME encoded message." . $eol;
+    $mail->FromName = "英文口說練習";
+    // 寄件者名稱(你自己要顯示的名稱)
+    $mail->From = "info@lalala.acsite.org"; 
+    //回覆信件至此信箱
 
-    // message
-    $body = "--" . $separator . $eol;
-    $body .= "Content-Type: text/plain; charset=\"iso-8859-1\"" . $eol;
-    $body .= "Content-Transfer-Encoding: 8bit" . $eol;
-    $body .= $message . $eol;
 
-    // attachment
-    $body .= "--" . $separator . $eol;
-    $body .= "Content-Type: application/octet-stream; name=\"" . $filename . "\"" . $eol;
-    $body .= "Content-Transfer-Encoding: base64" . $eol;
-    $body .= "Content-Disposition: attachment" . $eol;
-    $body .= $content . $eol;
-    $body .= "--" . $separator . "--";
+    $email = $mailto;
+    // 收件者信箱
+    $name = "mailto";
+    // 收件者的名稱or暱稱
 
-    //SEND Mail
-    if (mail($mailto, $subject, $body, $headers)) {
-        // echo "mail send ... OK"; // or use booleans here
-    } else {
-        //echo "mail send ... ERROR!";
+    $mail->SMTPKeepAlive = true;   
+    $mail->Mailer = “smtp”; // don't change the quotes!
+
+
+    $mail->AddAddress($email,$name);
+
+    $mail->IsHTML(true); // send as HTML
+
+    $mail->Subject = $subject; 
+    // 信件標題
+    $mail->Body = $message;
+    //信件內容(html版，就是可以有html標籤的如粗體、斜體之類)
+
+    $mail->addAttachment($filepath);
+
+    if(!$mail->Send()){
+    error_log("寄信發生錯誤：" . $mail->ErrorInfo);
+    //如果有錯誤會印出原因
+    }
+    else{ 
+    error_log("寄信成功");
     }
