@@ -14,13 +14,13 @@ CreateListUI = (function($, window){
 	        		$('#seriesSelector').append(new Option(series[series_id], series_id));	
 	        	}
 
-	        	CreateListUI.selectSeries()
+				CreateListUI.selectSeries()
            },
 
            selectSeries: function (){
 	           	var season = Source.script()[$('#seriesSelector').val()];
 	           	$('#seasonSelector').empty();
-		       	for(var season_id in season) {
+		       	for(var season_id = 1; season_id<=season.season_num; season_id++) {
 		    		$('#seasonSelector').append(new Option("第 " + season_id + " 季", season_id));	
 		    	}
 
@@ -29,15 +29,18 @@ CreateListUI = (function($, window){
 
            selectSeason: function () {
            		$('#episodeSelector').empty();
-           		var eposides = Source.script()[$('#seriesSelector').val()][$('#seasonSelector').val()];
-           		for(var eposide_id in eposides) {
+           		var season = Source.script()[$('#seriesSelector').val()];
+           		var eposide_num = season.episode_mapping[$('#seasonSelector').val()];
+           		for(var eposide_id=1; eposide_id <= eposide_num; eposide_id++) {
 		    		$('#episodeSelector').append(new Option("第 " + eposide_id + " 集", eposide_id));	
 		    	}
 		    	CreateListUI.selectEpisode()
            },
 
            selectEpisode: function () {
-           		var eposide = Source.script()[$('#seriesSelector').val()][$('#seasonSelector').val()][$('#episodeSelector').val()];
+           		var season = Source.script()[$('#seriesSelector').val()];
+           		var fileName = 'S' + $('#seasonSelector').val() + 'E' + $('#episodeSelector').val();
+           		var eposide = season[fileName];
            		$('#episodeContent').empty();
            		$('#episodeContent').append("最佳人數：" + eposide.recommend_num + "</br>");
            		$('#episodeContent').append("<ul><li>" + Object.keys(eposide.recommend_group).join('</li><li>') + "</li></ul>");
@@ -49,16 +52,18 @@ CreateListUI = (function($, window){
            			return;
            		}
 
-           		var eposide = Source.script()[$('#seriesSelector').val()][$('#seasonSelector').val()][$('#episodeSelector').val()];
+           		var season = Source.script()[$('#seriesSelector').val()];
+           		var fileName = 'S' + $('#seasonSelector').val() + 'E' + $('#episodeSelector').val();
+           		var eposide = season[fileName];	
            		var newDoc = db.collection("lists").doc();
            		newDoc.set({
-				    title: $('#seriesSelector :selected').text() + 'S' + $('#seasonSelector').val() + 'E' + $('#episodeSelector').val(),
+				    title: $('#seriesSelector :selected').text() + fileName,
 				    start_time: new Date($('#datetimepicker').data("DateTimePicker").date()),
 				    edit_time: new Date(),
 				    mode: "face_to_face",
 				    mode_data: $('#address').val(),
 				    number: eposide.recommend_num,
-				    reference: "sources/" + $('#seriesSelector').val() + "/" + $('#seasonSelector').val() + "/" + $('#episodeSelector').val(),
+				    reference: "sources/" + $('#seriesSelector').val() + "/" + fileName,
 				    joined: eposide.recommend_group,
 				    host_id: userData.uid,
 				    host: userData.displayName,

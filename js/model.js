@@ -6,7 +6,7 @@ Source = (function($, window){
 		db.collection("sources").get().then((series) => {
 			series.forEach(function(doc) {
 				seriesList[doc.id] = doc.data().title;
-				script[doc.id] = doc.data().script;
+				script[doc.id] = doc.data();
 	        });
 
 	        CreateListUI.updateSeries();

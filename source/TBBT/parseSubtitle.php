@@ -2,22 +2,29 @@
   $file_info = new finfo(FILEINFO_MIME);
   $files = array_slice(scandir('.'), 2);
   $scripts = Array();
-
+  $season_num = 0;
+  $episode_mapping = Array();
+/*
   foreach($files as $file){
     $mime_type = $file_info->buffer(file_get_contents($file));
     if($mime_type == 'text/plain; charset=utf-8') {
 
-      if(!preg_match('/(S1E[0-9]+)/', $file, $filename_matches)){
-      //if(!preg_match('/S([0-9]+)E([0-9]+)/', $file, $filename_matches)){
+      if(!preg_match('/(S([0-9]+)E([0-9]+))/', $file, $filename_matches)){
         continue;
       }
       
       echo "parsing {$file}<br>";
       $result = parseFile($file);
 
+      $season_num = max($filename_matches[2], $season_num);
+      $episode_mapping[$filename_matches[2]] = max($filename_matches[3], $episode_mapping[$filename_matches[2]]);
+
       $scripts[$filename_matches[1]] = $result;
     }
   }
+*/
+
+  $result = parseFile($argv[1]);
 
   function parseFile($file) {
     exec('grep \'[a-zA-Z]:\' '.$file.' | awk -F":" \'{print $1}\' | sort | uniq', $output);
@@ -45,7 +52,7 @@
 
     while(list($p, $w) = each($words)){
       $p = trim($p);
-      //$data["total_charactors"][$p] = $w;
+      $data["total_charactors"][$p] = $w;
       $newMapping[$i][] = $p;
       $total += $w;
       if($total > $average/$bestRatio) {
@@ -60,9 +67,9 @@
     }
     $data["recommend_num"] = count($data["recommend_group"]);
 
-    //echo print_r($newCount);
-    //echo print_r($data["recommend_group"]);
-    //echo "{$file} ".count($data["recommend_group"])."<br>";
+    echo print_r($newCount);
+    echo print_r($data["recommend_group"]);
+    echo print_r($data["total_charactors"]);
 
     return $data;
   }
@@ -98,6 +105,7 @@
     //人數小於三人的不要
     return count($newCount) < 3 ? 9999 : $diff;
   }
+/*
 ?>
 <html>
   <head>
@@ -116,7 +124,10 @@
     firebase.initializeApp(config);
     const db = firebase.firestore();
 
-    db.collection("sources_test").doc("TBBT").update({
+    db.collection("sources").doc("TBBT").update({
+      title: "生活大爆炸",
+      season_num: <?=$season_num?>,
+      episode_mapping: <?=json_encode($episode_mapping)?>,
       <?php
         foreach($scripts as $key => $value){
           $value = json_encode($value);
@@ -137,3 +148,4 @@
   </body>
 </html>
 <?
+*/
