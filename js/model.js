@@ -52,19 +52,27 @@ List = (function($, window){
 		var joined = total - Object.keys(Utility.joinedVacancy(data.joined)).length;
 		tmp.joined_number = joined + ' / ' + total;
 
-		if(data.start_time < new Date()){
+		if(joined == 0) {
+			tmp.join_btn_disabled = 'disabled';
+			tmp.join_btn_name = lang.meeting_dissolved;
+			tmp.join_btn_class = 'secondary';
+		}else if(data.start_time < new Date()){
 			tmp.join_btn_disabled = 'disabled';
 			tmp.join_btn_name = lang.meeting_is_end;
 			tmp.join_btn_class = 'secondary';
 		}else if(mylist[doc.id] != undefined){
 			var today = new Date();
+			//兩天前可以取消
 			if(data.start_time < new Date(today.getTime() + 86400*2)) {
 				tmp.join_btn_disabled = 'disabled';
 				tmp.join_btn_name = lang.meeting_joined;
 				tmp.join_btn_class = 'secondary';
+			} else if(userData.uid == data.host_id){
+				tmp.join_btn_disabled = '';
+				tmp.join_btn_name = lang.meeting_dissolve;
+				tmp.join_btn_class = 'success';
 			} else {
-				//host 不能離開，其它人可以
-				tmp.join_btn_disabled = (userData.uid == data.host_id) ? 'disabled' : '';
+				tmp.join_btn_disabled = '';
 				tmp.join_btn_name = lang.meeting_quit;
 				tmp.join_btn_class = 'success';
 			}
@@ -105,6 +113,7 @@ List = (function($, window){
 			}
 
 			db.collection("mylist").doc(userData.uid).collection("attended").orderBy('join_time', 'desc').limit(100).get().then((list) => {
+				LoginView.hide();
 				list.forEach(function(doc) {
 					doc.data().reference.get().then(item => {
 						var mylist = localStorage.mylist == undefined ? {} : JSON.parse(localStorage.mylist);
@@ -139,7 +148,7 @@ List = (function($, window){
 				db.collection("lists").doc(list_id).get().then((doc) => {
 					var character = Utility.randomCharacter(doc.data().joined);
 					var new_joined = doc.data().joined;
-					new_joined[character] = userData.uid;
+					new_joined[character] = userData.email;
 					var batch = db.batch();
 					batch.set(
 						db.collection("mylist").doc(userData.uid).collection("attended").doc(list_id),
@@ -161,16 +170,68 @@ List = (function($, window){
 							  dataType: 'json',
 							  data: {
 							  	data: JSON.stringify(doc.data()),
-							  	to: userData.email,
-							  	character: character
+							  	to: JSON.stringify([userData.email]),
+							  	character: character,
+							  	mode : 1
 							  },
 							});
+
+							//滿團要寄信通知所有人
+							var vacancyNum = Object.keys(Utility.joinedVacancy(doc.data().joined)).length;
+							if(vacancyNum == 0){
+								$.ajax({
+								  method: "POST",
+								  url: "send_mail.php",
+								  dataType: 'json',
+								  data: {
+								  	data: JSON.stringify(doc.data()),
+								  	to: JSON.stringify(doc.data().joined),
+								  	character: "",
+								  	mode : 2
+								  },
+								});
+							}
+							
 						});
 					    console.log("saveToMyList successfully written!");
 					    var mylist = localStorage.mylist == undefined ? {} : JSON.parse(localStorage.mylist);
 						mylist[list_id] = dataTransfer(doc);
 						localStorage.mylist = JSON.stringify(mylist);
 					});
+				});
+			});
+		},
+
+		dissolveMetting: function(list_id) {
+			db.collection("lists").doc(list_id).get().then((doc) => {
+				var joinedEmails = [];
+				Object.keys(doc.data().joined).forEach(function(key) {
+					if(doc.data().joined[key] != "") {
+						joinedEmails.push(doc.data().joined[key]);
+					}
+				});
+				var batch = db.batch();
+				batch.delete(db.collection("mylist").doc(userData.uid).collection("attended").doc(list_id));
+				batch.update(db.collection("lists").doc(list_id), {joined : Utility.joinedRemoveAll(doc.data().joined)});
+				batch.commit().then(function () {
+					db.collection("lists").doc(list_id).get().then((doc) => {
+						Card.cardReload(dataTransfer(doc));
+
+						$.ajax({
+							  method: "POST",
+							  url: "send_mail.php",
+							  dataType: 'json',
+							  data: {
+							  	data: JSON.stringify(doc.data()),
+							  	to: JSON.stringify(joinedEmails),
+							  	character: "",
+							  	mode : 3
+							  },
+						});
+					});
+				    var mylist = localStorage.mylist == undefined ? {} : JSON.parse(localStorage.mylist);
+				    delete mylist[list_id];
+					localStorage.mylist = JSON.stringify(mylist);
 				});
 			});
 		},

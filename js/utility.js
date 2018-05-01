@@ -49,6 +49,7 @@ $(document).ready(function(){
 		List.getAttendedLists(false);
 	}
 
+	LoginView.show();
 	List.getLists();
 });
 
@@ -102,11 +103,19 @@ Utility = (function($, window){
        joinedRemoveMyself: function(joined){
        		var emptyJoined = Object.assign({}, joined);
 			Object.keys(joined).forEach(function(key) {
-				if(emptyJoined[key] == userData.uid) {
+				if(emptyJoined[key] == userData.email) {
 					emptyJoined[key] = "";
 				}
 			});
 			return emptyJoined;
-       }
+       },
+
+       joinedRemoveAll: function(joined) {
+       		var emptyJoined = Object.assign({}, joined);
+			Object.keys(joined).forEach(function(key) {
+				emptyJoined[key] = "";
+			});
+			return emptyJoined;
+       },
     };
 }(jQuery, window));

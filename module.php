@@ -12,9 +12,10 @@
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
     <!-- 日期時間 picker -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
@@ -26,10 +27,10 @@
     <!-- firebase -->
     <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"></script>
-    <script src="js/utility.js?v=20180312"></script>
-    <script src="js/model.js?v=20180312"></script>
-    <script src="js/ui.js?v=20180312"></script>
-    <script src="js/lang.tw.js?v=20180312"></script>
+    <script src="js/utility.js?v=2018050103"></script>
+    <script src="js/model.js?v=2018050108"></script>
+    <script src="js/ui.js?v=2018050108"></script>
+    <script src="js/lang.tw.js?v=2018043003"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
     <!-- firebase -->
@@ -49,7 +50,6 @@
     <link href="css/blog.css" rel="stylesheet">
   </head>
   <body>
-
     <div class="container">
       <header class="py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
@@ -62,6 +62,9 @@
           </div>
         </div>
       </header>
+<?php
+  if($m != 'login'){ ?>
+    
       <p>
         <ul class="nav nav-tabs">
           <li class="nav-item">
@@ -73,9 +76,13 @@
           <li class="nav-item">
             <a class="nav-link" href="javascript:;" onclick="Tab.showMyLists(this);">參加過的</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="javascript:;" onclick="Tab.updateHistory(this);">更新歷程</a>
+          </li>
         </ul>
       </p>
 		<?php
+    }
 	}
 
   function cardTemplate(){
@@ -98,9 +105,10 @@
                 主持人：${host}<br>
                 <span style="color:red">${display_character}</span><br>
               </p>
-            <span style="width:100%"><a href="javascript:Card.join('${list_id}', '${join_btn_name}')" class="btn btn-${join_btn_class} float-right ${join_btn_disabled}" id="${list_id}_attend">${join_btn_name}</a></span>
+            <span style="width:100%">
+              <button type="button" onclick="Card.join('${list_id}', '${join_btn_name}', this)" class="btn btn-${join_btn_class} float-right ${join_btn_disabled}" id="${list_id}_attend" ${join_btn_disabled}>${join_btn_name}</button>
+            </span>
             </div>
-           
           </div>
         </div>
       </script>
@@ -167,5 +175,27 @@
     </div>
   </div>
 </div>
+    <?php
+  }
+
+  function loadingView(){
+    ?>
+    <script type="text/template" data-template="loadingView">
+      <div style="margin:0 auto;" id="loadingView"><i class='fa fa-spinner fa-spin'></i></div>
+    </script>
+    <?php
+  }
+
+  function history(){
+    ?>
+    <script type="text/template" data-template="history">
+      <div style="margin-left:35px;">
+        <hx>2018/05/01<hx>
+        <ul>
+          <li>新增主辦人解散功能。</li>
+          <li>新增成團通知。</li>
+          <li>新增更新歷程。</li>
+        </ul>
+      </div>
     <?php
   }

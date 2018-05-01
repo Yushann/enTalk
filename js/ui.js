@@ -95,6 +95,7 @@ Card = (function($, window){
 			    return card_template.map(render(item)).join('');
 			  });
 			$('#card_container').append(card);
+			LoginView.hide();
 		},
 
 		cardReload: function(item) {
@@ -103,16 +104,36 @@ Card = (function($, window){
 			$('#' + item.list_id).replaceWith(card);
 		},
 
-		join: function(list_id, text){
+		join: function(list_id, text, obj){
 			Login.forceLogin(function(){
 				if(text == lang.meeting_quit) {
+					$(obj).data("loading-text", "<i class='fa fa-circle-o-notch fa-spin'></i> 取消中……");
+					$(obj).button('loading');
 					List.quitMetting(list_id);
+				} else if(text == lang.meeting_dissolve) {
+					$(obj).data("loading-text", "<i class='fa fa-circle-o-notch fa-spin'></i> 取消中……");
+					$(obj).button('loading');
+					List.dissolveMetting(list_id);
 				} else {
+					$(obj).data("loading-text", "<i class='fa fa-circle-o-notch fa-spin'></i> 抽取角色中");
+					$(obj).button('loading');
 					List.saveToMyList(list_id);
 				}
 			});
 	 	},
 	};
+}(jQuery, window));
+
+LoginView = (function($, window){
+	return {
+		show: function(){
+			var loading = $('script[data-template="loadingView"]').text().split(/\$\{(.+?)\}/g);
+			$('#card_container').append(loading);
+		},
+		hide: function () {
+			$('#loadingView').remove();
+		},
+	}
 }(jQuery, window));
 
 Tab = (function($, window){
@@ -125,17 +146,25 @@ Tab = (function($, window){
 	return {
 		showLists: function(obj) {
 			prepare(obj);
+			LoginView.show();
 			List.getLists();
 		},
 		showEndLists: function(obj) {
 			prepare(obj);
+			LoginView.show();
 			List.getEndLists();
 		},
 		showMyLists: function(obj) {
 			Login.forceLogin(function(){
 				prepare(obj);
+				LoginView.show();
 				List.getAttendedLists();
 			});
 		},
+		updateHistory: function(obj){
+			prepare(obj);
+			var loading = $('script[data-template="history"]').text().split(/\$\{(.+?)\}/g);
+			$('#card_container').append(loading);
+		}
     };
 }(jQuery, window));

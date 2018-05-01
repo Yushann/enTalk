@@ -1,7 +1,7 @@
 <?php
   require_once('module.php');
 
-  htmlHead();
+  htmlHead('login');
 ?>
 	<script type="text/javascript">
   var uiConfig = {
