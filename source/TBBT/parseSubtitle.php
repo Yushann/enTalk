@@ -1,29 +1,23 @@
 <?php
-
-  define('AVERAGE', 0.7);
-
   $file_info = new finfo(FILEINFO_MIME);
   $files = array_slice(scandir('.'), 2);
   $scripts = Array();
 
-/*
   foreach($files as $file){
     $mime_type = $file_info->buffer(file_get_contents($file));
     if($mime_type == 'text/plain; charset=utf-8') {
 
-      if(!preg_match('/S([0-9]+)E([0-9]+)/', $file, $filename_matches)){
-        echo "fail {$file}<br>";
-        return;
+      if(!preg_match('/(S1E[0-9]+)/', $file, $filename_matches)){
+      //if(!preg_match('/S([0-9]+)E([0-9]+)/', $file, $filename_matches)){
+        continue;
       }
       
       echo "parsing {$file}<br>";
       $result = parseFile($file);
-      $scripts[$filename_matches[1]][$filename_matches[2]] = $result;
+
+      $scripts[$filename_matches[1]] = $result;
     }
   }
-*/
-
-  $result = parseFile('S1E7.txt');
 
   function parseFile($file) {
     exec('grep \'[a-zA-Z]:\' '.$file.' | awk -F":" \'{print $1}\' | sort | uniq', $output);
@@ -46,30 +40,64 @@
     $total = 0;
     $names = array_keys($words);
     $average = array_sum(array_values($words)) / count($words);
+
+    $bestRatio = getBestRatio($words, $average);
+
     while(list($p, $w) = each($words)){
       $p = trim($p);
-      $data["total_charactors"][$p] = $w;
+      //$data["total_charactors"][$p] = $w;
       $newMapping[$i][] = $p;
       $total += $w;
-      if($total > $average/AVERAGE) {
+      if($total > $average/$bestRatio) {
         $newCount[$i] = $total;
         $total = 0;
         $i++;
       }
     }
 
-    $data["recommend_num"] = count($data);
     while(list($k, $p) = each($newMapping)) {
       $data["recommend_group"][join(', ',$p)] = "";
     }
+    $data["recommend_num"] = count($data["recommend_group"]);
 
-    echo print_r($newCount);
-    echo print_r($data);
-    echo "{$file} ".count($data["recommend_group"])."<br>";
+    //echo print_r($newCount);
+    //echo print_r($data["recommend_group"]);
+    //echo "{$file} ".count($data["recommend_group"])."<br>";
 
     return $data;
   }
-/*
+
+  function getBestRatio($words, $average){
+    $ratios = array();
+    for($i=3; $i<10; $i++){
+      $ratios[$i] = getDiffNumberByRatio($words, $average, $i/10);
+    }
+
+    return array_search(min($ratios), $ratios)/10;
+  }
+
+  function getDiffNumberByRatio($words, $average, $ratio){
+    $perPerson = (int)$average/$ratio;
+    while(list($p, $w) = each($words)){
+      $p = trim($p);
+      $newMapping[$i][] = $p;
+      $total += $w;
+      if($total > $perPerson) {
+        $newCount[$i] = $total;
+        $total = 0;
+        $i++;
+      }
+    }
+
+    $diff = 0;
+    $perPerson = array_sum(array_values($words))/count($newCount);
+    foreach($newCount as $count) {
+      $diff += (int)abs($perPerson - $count);
+    }
+  
+    //人數小於三人的不要
+    return count($newCount) < 3 ? 9999 : $diff;
+  }
 ?>
 <html>
   <head>
@@ -88,8 +116,13 @@
     firebase.initializeApp(config);
     const db = firebase.firestore();
 
-    db.collection("sources").doc("TBBT").update({
-        script: <?=json_encode($scripts)?>,
+    db.collection("sources_test").doc("TBBT").update({
+      <?php
+        foreach($scripts as $key => $value){
+          $value = json_encode($value);
+          echo "{$key}: {$value},\n";
+        }
+      ?>
     })
     .then(function() {
         console.log("Document successfully written!");
@@ -103,4 +136,4 @@
     
   </body>
 </html>
-<?*/
+<?

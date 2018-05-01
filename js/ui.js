@@ -13,6 +13,7 @@ CreateListUI = (function($, window){
 	           	for(var series_id in series) {
 	        		$('#seriesSelector').append(new Option(series[series_id], series_id));	
 	        	}
+
 	        	CreateListUI.selectSeries()
            },
 
