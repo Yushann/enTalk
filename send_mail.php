@@ -20,8 +20,7 @@
     error_log(print_r($mailto, true));
 
 	$epsoide_data = explode('/', $data->reference);
-	$epsoide = "S{$epsoide_data[2]}E{$epsoide_data[3]}";
-	$filename = "{$epsoide}.txt";
+	$filename = "{$epsoide_data[2]}.txt";
 	$series = $epsoide_data[1];
 
 	$start_time = date("Y-m-d H:i", strtotime($data->start_time));
@@ -32,8 +31,8 @@
         case SEND_MODE_JOIN:
             $subject = "英文讀書會 {$start_date} {$data->title}";
             $message = "<br>時間：{$start_time}<br>地點：{$data->mode_data}<br>美劇：{$data->title}<br>角色：{$character}<br>主辦人：{$data->host}<br>聯絡方式：{$data->host_email}";
-            //$filepath = "/home/lalala/source/{$series}/{$filename}";
-            $filepath = "source/{$series}/{$filename}";
+            $filepath = "/home/lalala/source/{$series}/{$filename}";
+            //$filepath = "source/{$series}/{$filename}";
             break;
 
         case SEND_MODE_FULL_NOTIFY:
