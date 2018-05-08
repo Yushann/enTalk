@@ -12,4 +12,5 @@
   cardTemplate();
   history();
   createListModal();
+  memberListModal();
 ?>

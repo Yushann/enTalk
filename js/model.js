@@ -51,7 +51,18 @@ List = (function($, window){
 		var total = Object.keys(data.joined).length;
 		var joined = total - Object.keys(Utility.joinedVacancy(data.joined)).length;
 		tmp.joined_number = joined + ' / ' + total;
+		tmp.member_btn_hidden = 'hidden';
 
+		//成員名單
+		if(mylist[doc.id] != undefined && userData.uid == data.host_id){
+			tmp.member_btn_hidden = '';
+			tmp.member_list = '';
+			Object.keys(data.joined).forEach(function(key) {
+				tmp.member_list += '<p>' + key + '：<a href=mailto:' + data.joined[key] + '>' + data.joined[key] + '</a></p>';
+			});
+		}
+
+		//參加按鈕
 		if(joined == 0) {
 			tmp.join_btn_disabled = 'disabled';
 			tmp.join_btn_name = lang.meeting_dissolved;

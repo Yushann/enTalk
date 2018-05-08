@@ -27,10 +27,10 @@
     <!-- firebase -->
     <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"></script>
-    <script src="js/utility.js?v=20180508"></script>
-    <script src="js/model.js?v=20180508"></script>
-    <script src="js/ui.js?v=20180508"></script>
-    <script src="js/lang.tw.js?v=20180508"></script>
+    <script src="js/utility.js?v=20180509"></script>
+    <script src="js/model.js?v=20180509"></script>
+    <script src="js/ui.js?v=20180509"></script>
+    <script src="js/lang.tw.js?v=20180509"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
     <!-- firebase -->
@@ -107,6 +107,8 @@
               </p>
             <span style="width:100%">
               <button type="button" onclick="Card.join('${list_id}', '${join_btn_name}', this)" class="btn btn-${join_btn_class} float-right ${join_btn_disabled}" id="${list_id}_attend" ${join_btn_disabled}>${join_btn_name}</button>
+              <button type="button" class="btn btn-light" ${member_btn_hidden} onclick="MemberList.show('${list_id}');">成員名單</button>
+              <input type="hidden" id="${list_id}_member_list" value="${member_list}">
             </span>
             </div>
           </div>
@@ -178,6 +180,25 @@
     <?php
   }
 
+  function memberListModal(){
+    ?>
+<div class="modal" id="memberListModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" >
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">成員名單</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="member_list_body">
+      </div>
+    </div>
+  </div>
+</div>
+    <?php
+  }
+
   function loadingView(){
     ?>
     <script type="text/template" data-template="loadingView">
@@ -193,6 +214,7 @@
         <hx>2018/05/08<hx>
         <ul>
           <li>新增自動傳送 line 訊息。</li>
+          <li>新增主辦人可看到成員名單。</li>
         </ul>
         <hx>2018/05/01<hx>
         <ul>

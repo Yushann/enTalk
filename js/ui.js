@@ -142,6 +142,17 @@ LoginView = (function($, window){
 	}
 }(jQuery, window));
 
+
+MemberList = (function($, window){
+	return {
+		show: function(list_id){
+			$('#memberListModal').modal('show');
+			$('#member_list_body').html($('#'+list_id+'_member_list').val());
+		},
+	}
+}(jQuery, window));
+
+
 Tab = (function($, window){
 	var prepare = function(obj) {
 		$('#card_container').empty();
