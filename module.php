@@ -190,6 +190,10 @@
     ?>
     <script type="text/template" data-template="history">
       <div style="margin-left:35px;">
+        <hx>2018/05/08<hx>
+        <ul>
+          <li>新增自動傳送 line 訊息。</li>
+        </ul>
         <hx>2018/05/01<hx>
         <ul>
           <li>新增主辦人解散功能。</li>
