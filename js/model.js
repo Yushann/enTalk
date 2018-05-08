@@ -191,7 +191,19 @@ List = (function($, window){
 								  },
 								});
 							}
-							
+
+							//開團(1人參加)要有 line 通知
+							if(Object.keys(doc.data().joined).length - vacancyNum == 1) {
+								$.ajax({
+								  method: "POST",
+								  url: "line.php",
+								  dataType: 'json',
+								  data: {
+								  	data: JSON.stringify(doc.data()),
+								  	mode : 1
+								  },
+								});
+							}
 						});
 					    console.log("saveToMyList successfully written!");
 					    var mylist = localStorage.mylist == undefined ? {} : JSON.parse(localStorage.mylist);
@@ -244,6 +256,19 @@ List = (function($, window){
 				batch.commit().then(function () {
 					db.collection("lists").doc(list_id).get().then((doc) => {
 						Card.cardReload(dataTransfer(doc));
+
+						//如果是滿團缺一人，就通知
+						if(Object.keys(Utility.joinedVacancy(doc.data().joined)).length == 1) {
+							$.ajax({
+							  method: "POST",
+							  url: "line.php",
+							  dataType: 'json',
+							  data: {
+							  	data: JSON.stringify(doc.data()),
+							  	mode : 2
+							  },
+							});
+						}
 					});
 				    var mylist = localStorage.mylist == undefined ? {} : JSON.parse(localStorage.mylist);
 				    delete mylist[list_id];
